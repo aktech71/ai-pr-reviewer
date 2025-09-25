@@ -23,9 +23,6 @@ def handle_webhook():
     event = request.headers.get("X-GitHub-Event", "")
     payload = request.json
 
-    #test commit for auto PR approve
-    print(f"Received event: {event}")
-
     # Only handle pull_request events
     if event == "pull_request" and payload.get("action") in ["opened", "synchronize", "edited"]:
         owner = payload["repository"]["owner"]["login"]
