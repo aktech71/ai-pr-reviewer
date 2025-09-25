@@ -12,8 +12,6 @@ GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]        # Your Personal Access Token
 OPENAI_KEY = os.environ["OPENAI_API_KEY"]
 client = OpenAI(api_key=OPENAI_KEY)
 
-print(GITHUB_TOKEN, OPENAI_KEY)
-
 @app.route("/", methods=["GET"])
 def index():
     return "✅ Webhook server is running", 200
@@ -32,7 +30,7 @@ def handle_webhook():
 
         headers = {
             "Authorization": f"token {GITHUB_TOKEN}",
-            "Accept": "application/json"
+            "Accept": "application/vnd.github+json"
         }
 
         # 1) Get list of changed files
@@ -62,22 +60,26 @@ def handle_webhook():
         # 4) Post the summary as a comment
         comment_url = f"https://api.github.com/repos/{owner}/{repo}/issues/{pr_number}/comments"
         comment_payload = {"body": f"**PR Summary (AI):**\n\n{pr_summary}"}
-        requests.post(comment_url, headers=headers, json=comment_payload)
+        comment_res = requests.post(comment_url, headers=headers, json=comment_payload)
+        print(f"Posted summary comment: {comment_res.status_code} {comment_res.text}")
 
         # 5) Simple risk check → auto-approve if tiny PR
         total_changes = sum(f.get("changes", 0) for f in files)
         reviews_url = f"https://api.github.com/repos/{owner}/{repo}/pulls/{pr_number}/reviews"
 
         if total_changes < 10:
-            approve_payload = {"event": "APPROVE"}
-            requests.post(reviews_url, headers=headers, json=approve_payload)
+            approve_payload = {"event": "APPROVE", "body": "✅ Auto-approved by AI bot"}
+            approve_res = requests.post(reviews_url, headers=headers, json=approve_payload)
+            print(f"Posted auto-approve review: {approve_res.status_code} {approve_res.text}")
         else:
             # Otherwise, just leave a comment saying human review is recommended
-            requests.post(
+            comment_review_payload = {"event": "COMMENT", "body": "AI review complete. Human review recommended."}
+            comment_review_res = requests.post(
                 reviews_url,
                 headers=headers,
-                json={"event": "COMMENT", "body": "AI review complete. Human review recommended."}
+                json=comment_review_payload
             )
+            print(f"Posted comment review: {comment_review_res.status_code} {comment_review_res.text}")
 
     return jsonify({"status": "ok"}), 200
 
