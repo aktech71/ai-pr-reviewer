@@ -12,8 +12,6 @@ GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]        # Your Personal Access Token
 OPENAI_KEY = os.environ["OPENAI_API_KEY"]
 client = OpenAI(api_key=OPENAI_KEY)
 
-print("Starting webhook server...")
-print("Listening for GitHub webhooks...")
 
 @app.route("/", methods=["GET"])
 def index():
