@@ -11,7 +11,7 @@ app = Flask(__name__)
 GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]        # Your Personal Access Token
 OPENAI_KEY = os.environ["OPENAI_API_KEY"]
 client = OpenAI(api_key=OPENAI_KEY)
-print ("Starting webhook server...")
+
 
 
 @app.route("/", methods=["GET"])
