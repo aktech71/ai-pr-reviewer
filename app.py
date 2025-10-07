@@ -8,7 +8,8 @@ load_dotenv()  # Load environment variables from .env file
 app = Flask(__name__)
 
 # Load config from environment variables
-GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]        # Your Personal Access Token
+GITHUB_TOKEN = os.environ["GITHUB_TOKEN"]
+print(GITHUB_TOKEN)        # Your Personal Access Token
 OPENAI_KEY = os.environ["OPENAI_API_KEY"]
 client = OpenAI(api_key=OPENAI_KEY)
 
